@@ -161,9 +161,11 @@ bool PAK::bake(const std::string& outputDir_, BakeOptions options, const EntryCa
 
 			fileData.insert(fileData.end(), binData->begin(), binData->end());
 
-			size_t oldSize = nameData.size();
-			nameData.resize(oldSize + path.size() + 1);
-			memcpy(&nameData[oldSize], path.data(), path.size());
+			if (this->type == Type::SIN_RELOADED) {
+				size_t oldSize = nameData.size();
+				nameData.resize(oldSize + path.size() + 1);
+				memcpy(&nameData[oldSize], path.data(), path.size());
+			}
 		} else {
 			entry->offset = 0;
 			entry->length = 0;
