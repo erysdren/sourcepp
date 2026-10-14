@@ -74,3 +74,11 @@ TEST(vpkpp, vpp_v3_big_read) {
 	EXPECT_EQ(vpp->getEntryCount(), 20);
 	EXPECT_TRUE(vpp->hasEntry("pretty.txt"));
 }
+
+TEST(vpkpp, pak_sin_read) {
+	const auto vpp = PackFile::open(ASSET_ROOT "vpkpp/sin/test.sin");
+	ASSERT_TRUE(vpp);
+	VPKPP_PRINT_ALL_PATHS(vpp);
+	EXPECT_EQ(vpp->getEntryCount(), 3);
+	EXPECT_TRUE(vpp->hasEntry("vault/vault.json"));
+}
