@@ -155,6 +155,7 @@ bool PAK::bake(const std::string& outputDir_, BakeOptions options, const EntryCa
 	// Read data before overwriting, we don't know if we're writing to ourself
 	std::vector<std::byte> fileData;
 	std::vector<std::byte> nameData;
+	std::vector<uint32_t> nameOffsets;
 	for (auto& [path, entry] : entriesToBake) {
 		if (auto binData = this->readEntry(path)) {
 			entry->offset = fileData.size();
@@ -165,6 +166,7 @@ bool PAK::bake(const std::string& outputDir_, BakeOptions options, const EntryCa
 				size_t oldSize = nameData.size();
 				nameData.resize(oldSize + path.size() + 1);
 				memcpy(&nameData[oldSize], path.data(), path.size());
+				nameOffsets.push_back(oldSize);
 			}
 		} else {
 			entry->offset = 0;
@@ -204,10 +206,12 @@ bool PAK::bake(const std::string& outputDir_, BakeOptions options, const EntryCa
 			stream.write(fileData);
 
 			// Directory
+			size_t i = 0;
 			for (const auto& [path, entry] : entriesToBake) {
 				stream
 					.write<uint64_t>(entry->offset + HEADER_OFFSET)
-					.write<uint32_t>(entry->length);
+					.write<uint32_t>(entry->length)
+					.write<uint32_t>(nameOffsets[i++]);
 
 				if (callback) {
 					callback(path, *entry);
